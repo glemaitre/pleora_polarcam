@@ -1,6 +1,0 @@
-<launch>
-	<node name="polar_process" pkg="pleora_polarcam" type="polar_process.py" output="screen" />
-	<!-- <node pkg="rqt_image_view" type="rqt_image_view" name="rqt_image_view" /> -->
-
-
-</launch>

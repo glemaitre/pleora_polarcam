@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/lemaitre/catkin_ws/src/pleora_polarcam/pix2image.cpp
+pix2image.h
+-
+
+include/pix2image.h
+vector
+-
+stdexcept
+-
+opencv2/opencv.hpp
+-
+
