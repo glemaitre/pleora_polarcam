@@ -1,30 +1,56 @@
 #include <pix2image.h>
+
 //#include <photonfocus_camera.h>
 
+using namespace cv; 
+using namespace std; 
 
 namespace POLPro
 {
 
     std::vector<cv::Mat> raw2mat(const cv::Mat& origin)
-    {
+  {
         // define the size of the output
-        cv::Size output_size(origin.cols / 2, origin.rows / 2);
+	cv::Size output_size(origin.cols / 2, origin.rows / 2);
 
         // declare the vector containing the 4 angles images
         const int nb_angles = 4;
         std::vector<cv::Mat> output_img(nb_angles, cv::Mat::zeros(output_size,
-                                                                  CV_8U));
-
+                                                                 CV_8UC1));
+	
         // copy the data in the new image
-        for (int angle = 0; angle < nb_angles; ++angle)
-            for (int row = 0; row < output_size.height; ++row)
-                for (int col = 0; col < output_size.width; ++col)
-                {
-                    int offset_row = angle / 2;
-                    int offset_col = angle % 2;
-                    output_img[angle].at<uchar>(row, col) = origin.at<uchar>(
-                        2 * row + offset_row, 2 * col + offset_col);
-                }
+        // for (int angle = 0; angle < nb_angles; ++angle)
+        //     for (int row = 0; row < output_size.height; ++row)
+        //         for (int col = 0; col < output_size.width; ++col)
+        //         {
+        //             int offset_row = angle / 2;
+        //             int offset_col = angle % 2;
+        //             output_img[angle].at<uchar>(row, col) = origin.at<uchar>(
+        //                 2 * row + offset_row, 2 * col + offset_col);
+        //         }
+
+        int cols = origin.cols/2;
+        int rows = origin.rows/2;
+	cv::Mat I0 = cv::Mat(rows, cols, origin.type());
+	cv::Mat I45 = cv::Mat(rows, cols, origin.type());
+	cv::Mat I90 = cv::Mat(rows, cols, origin.type());
+	cv::Mat I135 = cv::Mat(rows, cols, origin.type());
+
+        for (int i=0; i<rows;i++){
+	    for (int j=0; j<cols;j++){
+	        I0.at<uchar>(i, j) = origin.at<uchar>(2*i, 2*j);
+		I45.at<uchar>(i, j) = origin.at<uchar>(2*i+1, 2*j);
+		I90.at<uchar>(i, j) = origin.at<uchar>(2*i, 2*j+1);
+	        I135.at<uchar>(i, j) = origin.at<uchar>(2*i+1,2*j+1);
+	    }
+        }
+
+
+
+	I0.copyTo(output_img[0]); 
+	I45.copyTo(output_img[1]); 
+	I90.copyTo(output_img[2]); 
+	I135.copyTo(output_img[3]); 
 
         // Return the image
         return output_img;
@@ -85,8 +111,10 @@ namespace POLPro
                         output_img[0], output_img[1],
                         true);
         // normalize the maps
+	// dop
         output_img[0] /= stokes_img[0];
-        output_img[1] *= 0.5;
+        // aop
+	output_img[1] *= 0.5;
         // copy s0
         stokes_img[0].copyTo(output_img[2]);
 
@@ -101,74 +129,139 @@ namespace POLPro
         return compute_polar_params(stokes_img);
     }
 
-    void imshow(std::vector<cv::Mat> img, bool as_hsv=false)
+
+//////////////////////
+
+    void imshow(std::vector<cv::Mat> img, bool as_hsv=false, 
+		bool as_stokes=true)
     {
         // through an error if there is not 3d img and hsv is turned on
         if ((img.size() != 3) && as_hsv)
             throw std::invalid_argument("img needs to be a 3 channels images"
                                         " if you need hsv support");
+	
+        // Declarig the appropriate size depeding on the image size
+	
+	if ((img.size() == 3) && as_stokes && !as_hsv){
+
+	    // define the number of maps
+	    const int nb_params = 3;
+	    // create the zeros images
+	    std::vector<cv::Mat> output_img(nb_params, cv::Mat::zeros(
+                                            img[0].size(), CV_8UC1));
+
+    	   img[0] = img[0]/2 ; 
+	   img[1] = (img[1]+255)/2; 
+	   img[2] = (img[2]+255)/2; 
+	   for (int i = 0;  i <=2; ++i){
+	       img[i].convertTo(img[i], CV_8UC1); 
+	       img[i].copyTo(output_img[i]); 
+	   }		
+					       
+	   for (int i = 0; i <=2 ; i++){
+	       imshow("s " +  std::to_string(i),
+		      output_img[i]);
+	   }
+	}else if ((img.size() == 3) && !as_stokes){
+	    
+	    // define the number of maps
+	    const int nb_params = 3;
+	    // create the zeros images
+	    std::vector<cv::Mat> output_img(nb_params, cv::Mat::zeros(
+                                            img[0].size(), CV_8UC1));
+	    img[0] = img[0]*255 ;
+	    img[2] = img[2]/2; 
+	    for (int i = 0; i <=2; ++i){
+	       img[i].convertTo(img[i], CV_8UC1); 
+	       img[i].copyTo(output_img[i]); 
+	    }
+	    // for (auto it = img.begin(); it != img.end(); ++it)
+	    // 	output_img[it] = img[it].ConvertTo(img[it], CV_8UC1); 
+	  
+
+	    if (as_hsv){
+		// merge the vector into a single matrix
+		cv::Mat img_hsv; 
+		merge(output_img, img_hsv); 
+
+		// convert from bgr to hsl
+		cv::Mat HSL; 
+		cvtColor(img_hsv, HSL, CV_HLS2BGR);
+    
+		// show the hsv image 
+		imshow("hsv image", img_hsv);  
+		// DoP image 
+		imshow("DoP", output_img[0]); 
+		// AoP image
+		imshow("AoP", output_img[1]); 
+	    
+	    }else{
+		  
+		// DoP image 
+		imshow("DoP", output_img[0]); 
+		// AoP image
+		imshow("AoP", output_img[1]); 
+	    
+	    }
+        
+    		 
+	}else if (img.size() ==4){
+	    // these images are already in 8 bit and does not require conversion
+	    // define the number of maps
+	    const int nb_params = 4;
+	    // create the zeros images
+	    std::vector<cv::Mat> output_img(nb_params, cv::Mat::zeros(
+                                            img[0].size(), CV_8UC1));
+	    for (int i = 0; i <=3; i++){
+	       img[i].copyTo(output_img[i]); 
+	    }
+	   
+	    //for (auto it = output_img.begin(); it != output_img.end(); ++it){
+	
+	    for (int i = 0; i <=3; i++){
+	    	imshow("I " + std::to_string(i),
+		       output_img[i]);
+	    }
+	    	    
+	}else{
+	    throw std::invalid_argument("img needs to be a 3 or 4 channels"); 
+	}
+
+	
+
     }
+}
 
-    // convert all images in 8 bits
-    // check that we have stokes or the polar params
 
-    if (as_hsv)
+					       
+int main( int argc, char** argv )
+{
+    if( argc != 2)
     {
-        // merge the vector into a single matrix
-        // convert from bgr to hsv
-        // show the image
-    } else {
-        // the three images needs to be show individually
-        // in three different windows, iterating over the
-        // vector
+	cout <<" Usage: display_image ImageToLoadAndDisplay" << endl;
+     return -1;
     }
 
-    // void Pix2Image::pix2rgb (cv::Mat img)
-    // {
+    Mat image = imread(argv[1], CV_LOAD_IMAGE_GRAYSCALE);   // Read the file
 
-    //     /* Conversion into 8 bits depth image */
-    //     s0 = s0/2;
-    //     s1 = (s1+255.0)/2;
-    //     s2 = (s2+255.0)/2;
-    //     s0.convertTo(s0, CV_8UC1);
-    //     s1.convertTo(s1, CV_8UC1);
-    //     s2.convertTo(s2, CV_8UC1);
+    if(! image.data )                              // Check for invalid input
+    {
+        cout <<  "Could not open or find the image" << std::endl ;
+        return -1;
+    }
 
-    //     /* HSV representation */
-    //     cv::Mat S = dop * 255; // S in the range 0:255
-    //     cv::Mat H = aop; // H in the range 0:180
-    //     S.convertTo(S, CV_8UC1);
-    //     H.convertTo(H, CV_8UC1);
+   
+    std::vector<cv::Mat> angle_image = POLPro::raw2mat(image); 
 
-    //     vector<cv::Mat> channels;
-    //     channels.push_back(H);
-    //     channels.push_back(S);
-    //     channels.push_back(s0);
-
-    //     Mat img_hsv;
-    //     merge(channels, img_hsv);
-
-    //     Mat HSL;
-    //     cvtColor(img_hsv, HSL, CV_HLS2BGR);
-
-    //     Mat Stokes = Mat(rows*2, cols*2, image.type());
-    //     s0.copyTo(Stokes(cv::Rect(0, 0, s0.cols, s0.rows)));
-    //     s1.copyTo(Stokes(cv::Rect(cols, 0, s1.cols, s1.rows)));
-    //     s2.copyTo(Stokes(cv::Rect(0, rows, s2.cols, s2.rows)));
-
-    //     Mat PolFea = Mat(rows*2, cols*2, image.type());
-    //     S.copyTo(PolFea(cv::Rect(0, 0, S.cols, S.rows))); //DoP
-    //     H.copyTo(PolFea(cv::Rect(cols, 0, H.cols, H.rows))); //AoP
-    //     /* show images */
-    //     imshow( "Pixelated image", image);
-    //     imshow("hsv", img_hsv);
-    //     imshow("Stokes", Stokes);
-    //     imshow("Polfea", PolFea);
-    //     waitKey(0);                                          // Wait for a keystroke in the window
-
-    //     return 0;
-    // }
-
-
-
+   //std::vector<cv::Mat> stokes_images = POLPro::compute_stokes(angle_image);
+   // std::vector<cv::Mat> polar_images = 
+   //     POLPro::compute_polar_params(stokes_images);
+   
+   // POLPro::imshow(stokes_images); 
+   // POLPro::imshow(polar_images, true, false); 
+    POLPro::imshow(angle_image); 
+    //imshow("parsed image", angle_image); 
+   waitKey(0); 
+   return 0 ; 
+   
 }

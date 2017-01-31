@@ -7,6 +7,13 @@
 #include <stdexcept>
 
 #include <opencv2/opencv.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <iostream>
+
+
+
 //#include <photonfocus_camera.h>
 
 namespace POLPro
@@ -21,8 +28,7 @@ namespace POLPro
     std::vector<cv::Mat> compute_polar_params(
         const std::vector<cv::Mat>& origin);
 
-    void imshow(std::vector<cv::Mat> img, bool as_hsv);
+    void imshow(std::vector<cv::Mat> img, bool as_hsv, bool as_stokes);
 
-    //  void pix2rgb (const cv::Mat& img);
 }
 #endif //pix2image.h
