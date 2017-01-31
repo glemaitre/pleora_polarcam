@@ -101,6 +101,28 @@ namespace POLPro
         return compute_polar_params(stokes_img);
     }
 
+    void imshow(std::vector<cv::Mat> img, bool as_hsv=false)
+    {
+        // through an error if there is not 3d img and hsv is turned on
+        if ((img.size() != 3) && as_hsv)
+            throw std::invalid_argument("img needs to be a 3 channels images"
+                                        " if you need hsv support");
+    }
+
+    // convert all images in 8 bits
+    // check that we have stokes or the polar params
+
+    if (as_hsv)
+    {
+        // merge the vector into a single matrix
+        // convert from bgr to hsv
+        // show the image
+    } else {
+        // the three images needs to be show individually
+        // in three different windows, iterating over the
+        // vector
+    }
+
     // void Pix2Image::pix2rgb (cv::Mat img)
     // {
 

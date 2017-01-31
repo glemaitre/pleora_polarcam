@@ -21,6 +21,7 @@ namespace POLPro
     std::vector<cv::Mat> compute_polar_params(
         const std::vector<cv::Mat>& origin);
 
+    void imshow(std::vector<cv::Mat> img, bool as_hsv);
 
     //  void pix2rgb (const cv::Mat& img);
 }
