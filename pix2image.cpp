@@ -30,34 +30,31 @@ namespace POLPro
         return output_img;
     }
 
-    cv::Mat compute_stokes(const std::vector<cv::Mat>& angles_img)
+    std::vector<cv::Mat> compute_stokes(const std::vector<cv::Mat>& angles_img)
     {
-        // refactor the raw image
-        std::vector<cv::Mat> angles_img = raw2mat(origin);
-
         // define the number of images to have for Stokes
         const int nb_stokes_img = 3;
         // Create zeros images
         std::vector<cv::Mat> output_img(nb_stokes_img, cv::Mat::zeros(
-                                            angles_img[0].size(), cv::CV_32F));
+                                            angles_img[0].size(), CV_32F));
 
         // compute the Stokes parameters maps
         // S0: add the different angles
         for (auto it = angles_img.begin(); it != angles_img.end(); ++it)
             cv::add(output_img[0], *it, output_img[0], cv::noArray(),
-                    cv::CV_32F);
-        output_size[0] /= 2.0;
+                    CV_32F);
+        output_img[0] /= 2.0;
         // S1: subtract angles 0 and 90
         cv::subtract(angles_img[0], angles_img[2], output_img[1],
-                     cv::noArray(), cv::CV_32F);
+                     cv::noArray(), CV_32F);
         // S2: subtract angles 45 and 135
         cv::subtract(angles_img[1], angles_img[3], output_img[2],
-                     cv::noArray(), cv::CV_32F);
+                     cv::noArray(), CV_32F);
 
         return output_img;
     }
 
-    cv::Mat compute_stokes(const cv::Mat& origin)
+    std::vector<cv::Mat> compute_stokes(const cv::Mat& origin)
     {
         // refactor the raw image
         std::vector<cv::Mat> angles_img = raw2mat(origin);
@@ -68,20 +65,23 @@ namespace POLPro
     std::vector<cv::Mat> compute_polar_params(
         const std::vector<cv::Mat>& origin)
     {
+        std::vector<cv::Mat> stokes_img;
         // Check if we have the original data or the stokes
         if (origin.size() == 4)
         {
-            std::vector<cv::Mat> stokes_img = compute_stokes(origin);
+            stokes_img = compute_stokes(origin);
+        } else {
+            stokes_img = origin;
         }
 
         // define the number of maps
         const int nb_params = 3;
         // create the zeros images
         std::vector<cv::Mat> output_img(nb_params, cv::Mat::zeros(
-                                            stokes_img[0].size(), cv::CV_32F));
+                                            stokes_img[0].size(), CV_32F));
 
         // compute the polar coordinate in degrees
-        cv::cartToPolar(stokes_img[1], stoke_img[2],
+        cv::cartToPolar(stokes_img[1], stokes_img[2],
                         output_img[0], output_img[1],
                         true);
         // normalize the maps
