@@ -15,10 +15,12 @@ namespace POLPro
 
         // declare the vector containing the 4 angles images
         const int nb_angles = 4;
-        std::vector<cv::Mat> output_img(nb_angles, cv::Mat::zeros(output_size,
-                                                                 CV_8UC1));
+        std::vector<cv::Mat> output_img(nb_angles, cv::Mat::zeros
+					(output_size, origin.type()));
 	
         // copy the data in the new image
+	// Efficient way 
+
         // for (int angle = 0; angle < nb_angles; ++angle)
         //     for (int row = 0; row < output_size.height; ++row)
         //         for (int col = 0; col < output_size.width; ++col)
@@ -29,6 +31,7 @@ namespace POLPro
         //                 2 * row + offset_row, 2 * col + offset_col);
         //         }
 
+	// dummy way 
         int cols = origin.cols/2;
         int rows = origin.rows/2;
 	cv::Mat I0 = cv::Mat(rows, cols, origin.type());
@@ -44,14 +47,12 @@ namespace POLPro
 	        I135.at<uchar>(i, j) = origin.at<uchar>(2*i+1,2*j+1);
 	    }
         }
-
-
-
-	I0.copyTo(output_img[0]); 
-	I45.copyTo(output_img[1]); 
-	I90.copyTo(output_img[2]); 
-	I135.copyTo(output_img[3]); 
-
+	output_img[0] = I0; 
+	output_img[1] = I45; 
+	output_img[2] = I90; 
+	output_img[3] = I135; 
+	
+	
         // Return the image
         return output_img;
     }
@@ -66,10 +67,23 @@ namespace POLPro
 
         // compute the Stokes parameters maps
         // S0: add the different angles
-        for (auto it = angles_img.begin(); it != angles_img.end(); ++it)
-            cv::add(output_img[0], *it, output_img[0], cv::noArray(),
-                    CV_32F);
-        output_img[0] /= 2.0;
+        // for (auto it = angles_img.begin(); it != angles_img.end(); ++it)
+        //     cv::add(output_img[0], *it, output_img[0], cv::noArray(),
+        //             CV_32F);
+        // output_img[0] /= 2.0;
+
+	double min, max;
+        Point idmin, idmax;
+
+        add(angles_img[0], angles_img[2], output_img[0], noArray(), CV_32F);
+	add(angles_img[1], output_img[0], output_img[0], noArray(), CV_32F);
+        add(angles_img[3], output_img[0], output_img[0], noArray(), CV_32F);
+        
+	output_img[0] = output_img[0] / 2.0;
+
+	minMaxLoc(output_img[0], &min, &max, &idmin, &idmax) ;
+        cout <<"min max s0: " << min << " " << max << std::endl;
+
         // S1: subtract angles 0 and 90
         cv::subtract(angles_img[0], angles_img[2], output_img[1],
                      cv::noArray(), CV_32F);
@@ -135,6 +149,9 @@ namespace POLPro
     void imshow(std::vector<cv::Mat> img, bool as_hsv=false, 
 		bool as_stokes=true)
     {
+	int cols = img[0].rows; 
+	int rows = img[0].cols; 
+
         // through an error if there is not 3d img and hsv is turned on
         if ((img.size() != 3) && as_hsv)
             throw std::invalid_argument("img needs to be a 3 channels images"
@@ -144,24 +161,29 @@ namespace POLPro
 	
 	if ((img.size() == 3) && as_stokes && !as_hsv){
 
-	    // define the number of maps
-	    const int nb_params = 3;
 	    // create the zeros images
-	    std::vector<cv::Mat> output_img(nb_params, cv::Mat::zeros(
-                                            img[0].size(), CV_8UC1));
-
-    	   img[0] = img[0]/2 ; 
-	   img[1] = (img[1]+255)/2; 
-	   img[2] = (img[2]+255)/2; 
+	    cv::Mat output_img(img[0].rows*2, img[0].cols*2, CV_8UC1);
+	    cv::Mat s; 
+	    s = img[0]; 
+    	   s = s/2.0 ; 
+	   img[1] = (img[1]+255.0)/2.0; 
+	   img[2] = (img[2]+255.0)/2.0; 
 	   for (int i = 0;  i <=2; ++i){
 	       img[i].convertTo(img[i], CV_8UC1); 
-	       img[i].copyTo(output_img[i]); 
-	   }		
+	       }		
 					       
-	   for (int i = 0; i <=2 ; i++){
-	       imshow("s " +  std::to_string(i),
-		      output_img[i]);
-	   }
+
+	    s.copyTo(output_img(cv::Rect(0, 0, 
+					      s.cols, s.rows)));
+	    img[1].copyTo(output_img(cv::Rect(rows, 0, 
+					      img[1].cols, img[1].rows)));
+	    img[2].copyTo(output_img(cv::Rect(0, cols, 
+					      img[2].cols, img[2].rows)));
+	    
+
+	    imshow("Stokes-params", output_img); 
+
+
 	}else if ((img.size() == 3) && !as_stokes){
 	    
 	    // define the number of maps
@@ -207,21 +229,20 @@ namespace POLPro
     		 
 	}else if (img.size() ==4){
 	    // these images are already in 8 bit and does not require conversion
-	    // define the number of maps
-	    const int nb_params = 4;
 	    // create the zeros images
-	    std::vector<cv::Mat> output_img(nb_params, cv::Mat::zeros(
-                                            img[0].size(), CV_8UC1));
-	    for (int i = 0; i <=3; i++){
-	       img[i].copyTo(output_img[i]); 
-	    }
+	    cv::Mat output_img(img[0].rows*2, img[0].cols*2, CV_8UC1);
 	   
-	    //for (auto it = output_img.begin(); it != output_img.end(); ++it){
-	
-	    for (int i = 0; i <=3; i++){
-	    	imshow("I " + std::to_string(i),
-		       output_img[i]);
-	    }
+	    img[0].copyTo(output_img(cv::Rect(0, 0, 
+					      img[0].cols, img[0].rows)));
+	    img[1].copyTo(output_img(cv::Rect(rows, 0, 
+					      img[1].cols, img[1].rows)));
+	    img[2].copyTo(output_img(cv::Rect(0, cols, 
+					      img[2].cols, img[2].rows)));
+	    img[3].copyTo(output_img(cv::Rect(rows, cols, 
+					      img[3].cols, img[3].rows)));
+
+
+	    imshow("parsed_image", output_img); 
 	    	    
 	}else{
 	    throw std::invalid_argument("img needs to be a 3 or 4 channels"); 
@@ -252,13 +273,14 @@ int main( int argc, char** argv )
 
    
     std::vector<cv::Mat> angle_image = POLPro::raw2mat(image); 
-
-   //std::vector<cv::Mat> stokes_images = POLPro::compute_stokes(angle_image);
-   // std::vector<cv::Mat> polar_images = 
-   //     POLPro::compute_polar_params(stokes_images);
+    cout << "image size \t" << angle_image.size()<< std::endl; 
    
-   // POLPro::imshow(stokes_images); 
-   // POLPro::imshow(polar_images, true, false); 
+    std::vector<cv::Mat> stokes_images = POLPro::compute_stokes(image);
+    // std::vector<cv::Mat> polar_images = 
+    //     POLPro::compute_polar_params(stokes_images);
+   
+    POLPro::imshow(stokes_images); 
+    // POLPro::imshow(polar_images, true, false); 
     POLPro::imshow(angle_image); 
     //imshow("parsed image", angle_image); 
    waitKey(0); 
