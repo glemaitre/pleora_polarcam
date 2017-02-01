@@ -12,7 +12,7 @@ namespace POLPro
   {
         // define the size of the output
 	cv::Size output_size(origin.cols / 2, origin.rows / 2);
-
+	imshow("original imahe", origin);
         // declare the vector containing the 4 angles images
         const int nb_angles = 4;
         std::vector<cv::Mat> output_img(nb_angles, cv::Mat::zeros
@@ -21,36 +21,39 @@ namespace POLPro
         // copy the data in the new image
 	// Efficient way 
 
-        // for (int angle = 0; angle < nb_angles; ++angle)
-        //     for (int row = 0; row < output_size.height; ++row)
-        //         for (int col = 0; col < output_size.width; ++col)
-        //         {
-        //             int offset_row = angle / 2;
-        //             int offset_col = angle % 2;
-        //             output_img[angle].at<uchar>(row, col) = origin.at<uchar>(
-        //                 2 * row + offset_row, 2 * col + offset_col);
-        //         }
-
-	// dummy way 
-        int cols = origin.cols/2;
-        int rows = origin.rows/2;
-	cv::Mat I0 = cv::Mat(rows, cols, origin.type());
-	cv::Mat I45 = cv::Mat(rows, cols, origin.type());
-	cv::Mat I90 = cv::Mat(rows, cols, origin.type());
-	cv::Mat I135 = cv::Mat(rows, cols, origin.type());
-
-        for (int i=0; i<rows;i++){
-	    for (int j=0; j<cols;j++){
-	        I0.at<uchar>(i, j) = origin.at<uchar>(2*i, 2*j);
-		I45.at<uchar>(i, j) = origin.at<uchar>(2*i+1, 2*j);
-		I90.at<uchar>(i, j) = origin.at<uchar>(2*i, 2*j+1);
-	        I135.at<uchar>(i, j) = origin.at<uchar>(2*i+1,2*j+1);
+        for (int angle = 0; angle < nb_angles; ++angle){
+	    int offset_row = angle % 2;
+	    int offset_col = angle / 2;
+            cout<< "offset_row \t" << offset_row << "\t offset_col \t"<< 
+		offset_col <<std::endl; 
+       
+            for (int row = 0; row < origin.rows/2; ++row){
+                for (int col = 0; col < origin.cols/2; ++col){
+                    output_img[angle].at<uchar>(row, col) = origin.at<uchar>(
+                        2 * row + offset_row, 2 * col + offset_col);
+                }
 	    }
-        }
-	output_img[0] = I0; 
-	output_img[1] = I45; 
-	output_img[2] = I90; 
-	output_img[3] = I135; 
+	}
+	// dummy way 
+        // int cols = origin.cols/2;
+        // int rows = origin.rows/2;
+	// cv::Mat I0 = cv::Mat(rows, cols, origin.type());
+	// cv::Mat I45 = cv::Mat(rows, cols, origin.type());
+	// cv::Mat I90 = cv::Mat(rows, cols, origin.type());
+	// cv::Mat I135 = cv::Mat(rows, cols, origin.type());
+
+        // for (int i=0; i<rows;i++){
+	//     for (int j=0; j<cols;j++){
+	//         I0.at<uchar>(i, j) = origin.at<uchar>(2*i, 2*j);
+	// 	I45.at<uchar>(i, j) = origin.at<uchar>(2*i+1, 2*j);
+	// 	I90.at<uchar>(i, j) = origin.at<uchar>(2*i, 2*j+1);
+	//         I135.at<uchar>(i, j) = origin.at<uchar>(2*i+1,2*j+1);
+	//     }
+        // }
+	// output_img[0] = I0; 
+	// output_img[1] = I45; 
+	// output_img[2] = I90; 
+	// output_img[3] = I135; 
 	
 	
         // Return the image
@@ -151,7 +154,7 @@ namespace POLPro
     {
 	int cols = img[0].rows; 
 	int rows = img[0].cols; 
-
+   
         // through an error if there is not 3d img and hsv is turned on
         if ((img.size() != 3) && as_hsv)
             throw std::invalid_argument("img needs to be a 3 channels images"
