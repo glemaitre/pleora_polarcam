@@ -29,7 +29,6 @@ namespace POLPro
         const std::vector<cv::Mat>& origin);
 
     void imshow(std::vector<cv::Mat> img, bool as_hsv, bool as_stokes);
-    int minmax(cv::Mat img, std::string& name);
-
+    int minmax(cv::Mat img, std::string s);
 }
 #endif //pix2image.h
