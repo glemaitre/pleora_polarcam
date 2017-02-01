@@ -263,15 +263,20 @@ int main( int argc, char** argv )
 
     // parsed image from original image 
     std::vector<cv::Mat> angle_image = POLPro::raw2mat(image); 
-    POLPro::imshow(angle_image); 
     
     // Stokes parameters 
     std::vector<cv::Mat> stokes_images = POLPro::compute_stokes(image);
-    POLPro::imshow(stokes_images); 
     
     // polar componnets
     std::vector<cv::Mat> polar_images = 
 	POLPro::compute_polar_params(stokes_images); 
+
+    //showing the paramters
+
+    POLPro::imshow(angle_image); 
+
+    POLPro::imshow(stokes_images); 
+
     POLPro::imshow(polar_images, false, false); 
     
    waitKey(0); 
