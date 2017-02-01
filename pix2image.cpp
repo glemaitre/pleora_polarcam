@@ -22,39 +22,19 @@ namespace POLPro
 	// Efficient way 
 
         for (int angle = 0; angle < nb_angles; ++angle){
-	    int offset_row = angle % 2;
-	    int offset_col = angle / 2;
-            cout<< "offset_row \t" << offset_row << "\t offset_col \t"<< 
-		offset_col <<std::endl; 
-       
+	    int offset_row = angle / 2;
+	    int offset_col = angle % 2;
+	    cv::Mat temp  = cv::Mat(origin.rows / 2, origin.cols /2, 
+				    origin.type());  
             for (int row = 0; row < origin.rows/2; ++row){
                 for (int col = 0; col < origin.cols/2; ++col){
-                    output_img[angle].at<uchar>(row, col) = origin.at<uchar>(
-                        2 * row + offset_row, 2 * col + offset_col);
+		    temp.at<uchar>(row, col) = origin.at<uchar>(
+                        2 * row + offset_row, 2 * col + offset_col); 
                 }
 	    }
-	}
-	// dummy way 
-        // int cols = origin.cols/2;
-        // int rows = origin.rows/2;
-	// cv::Mat I0 = cv::Mat(rows, cols, origin.type());
-	// cv::Mat I45 = cv::Mat(rows, cols, origin.type());
-	// cv::Mat I90 = cv::Mat(rows, cols, origin.type());
-	// cv::Mat I135 = cv::Mat(rows, cols, origin.type());
-
-        // for (int i=0; i<rows;i++){
-	//     for (int j=0; j<cols;j++){
-	//         I0.at<uchar>(i, j) = origin.at<uchar>(2*i, 2*j);
-	// 	I45.at<uchar>(i, j) = origin.at<uchar>(2*i+1, 2*j);
-	// 	I90.at<uchar>(i, j) = origin.at<uchar>(2*i, 2*j+1);
-	//         I135.at<uchar>(i, j) = origin.at<uchar>(2*i+1,2*j+1);
-	//     }
-        // }
-	// output_img[0] = I0; 
-	// output_img[1] = I45; 
-	// output_img[2] = I90; 
-	// output_img[3] = I135; 
-	
+	    
+	    output_img[angle] = temp;
+	}	
 	
         // Return the image
         return output_img;
@@ -75,25 +55,21 @@ namespace POLPro
         //             CV_32F);
         // output_img[0] /= 2.0;
 
-	double min, max;
-        Point idmin, idmax;
-
+	
         add(angles_img[0], angles_img[2], output_img[0], noArray(), CV_32F);
 	add(angles_img[1], output_img[0], output_img[0], noArray(), CV_32F);
         add(angles_img[3], output_img[0], output_img[0], noArray(), CV_32F);
         
 	output_img[0] = output_img[0] / 2.0;
-
-	minMaxLoc(output_img[0], &min, &max, &idmin, &idmax) ;
-        cout <<"min max s0: " << min << " " << max << std::endl;
-
+	std::string name = "s0"; 
+	minmax(output_img[0], name);  
         // S1: subtract angles 0 and 90
         cv::subtract(angles_img[0], angles_img[2], output_img[1],
                      cv::noArray(), CV_32F);
-        // S2: subtract angles 45 and 135
+	// S2: subtract angles 45 and 135
         cv::subtract(angles_img[1], angles_img[3], output_img[2],
                      cv::noArray(), CV_32F);
-
+	
         return output_img;
     }
 
@@ -147,7 +123,14 @@ namespace POLPro
     }
 
 
-//////////////////////
+
+    int minmax (cv::Mat img, std::string& name)
+    {
+	double min, max;
+        Point idmin, idmax;
+        minMaxLoc(img, &min, &max, &idmin, &idmax) ;
+        cout <<"min max " + name + " : " << min << " " << max << std::endl;
+    }
 
     void imshow(std::vector<cv::Mat> img, bool as_hsv=false, 
 		bool as_stokes=true)

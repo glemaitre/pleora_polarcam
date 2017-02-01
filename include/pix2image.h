@@ -11,7 +11,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
-
+#include <string>
 
 
 //#include <photonfocus_camera.h>
@@ -29,6 +29,7 @@ namespace POLPro
         const std::vector<cv::Mat>& origin);
 
     void imshow(std::vector<cv::Mat> img, bool as_hsv, bool as_stokes);
+    int minmax(cv::Mat img, std::string& name);
 
 }
 #endif //pix2image.h
