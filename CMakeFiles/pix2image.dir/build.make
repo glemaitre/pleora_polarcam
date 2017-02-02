@@ -102,6 +102,7 @@ pix2image: /usr/lib/x86_64-linux-gnu/libopencv_features2d.so.2.4.8
 pix2image: /usr/lib/x86_64-linux-gnu/libopencv_core.so.2.4.8
 pix2image: /usr/lib/x86_64-linux-gnu/libopencv_contrib.so.2.4.8
 pix2image: /usr/lib/x86_64-linux-gnu/libopencv_calib3d.so.2.4.8
+pix2image: /usr/lib/x86_64-linux-gnu/libboost_program_options.so
 pix2image: /usr/lib/x86_64-linux-gnu/libopencv_photo.so.2.4.8
 pix2image: /usr/lib/x86_64-linux-gnu/libopencv_legacy.so.2.4.8
 pix2image: /usr/lib/x86_64-linux-gnu/libopencv_video.so.2.4.8

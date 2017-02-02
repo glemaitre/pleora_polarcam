@@ -14,6 +14,21 @@
 # EXTERNAL cache entries
 ########################
 
+//The directory containing a CMake configuration file for Boost.
+Boost_DIR:PATH=Boost_DIR-NOTFOUND
+
+//Path to a file.
+Boost_INCLUDE_DIR:PATH=/usr/include
+
+//Boost library directory
+Boost_LIBRARY_DIR:PATH=/usr/lib/x86_64-linux-gnu
+
+//Boost program_options library (debug)
+Boost_PROGRAM_OPTIONS_LIBRARY_DEBUG:FILEPATH=/usr/lib/x86_64-linux-gnu/libboost_program_options.so
+
+//Boost program_options library (release)
+Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE:FILEPATH=/usr/lib/x86_64-linux-gnu/libboost_program_options.so
+
 //Path to a program.
 CMAKE_AR:FILEPATH=/usr/bin/ar
 
@@ -208,6 +223,16 @@ pix2image_SOURCE_DIR:STATIC=/home/lemaitre/catkin_ws/src/pleora_polarcam
 # INTERNAL cache entries
 ########################
 
+//ADVANCED property for variable: Boost_DIR
+Boost_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_INCLUDE_DIR
+Boost_INCLUDE_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_LIBRARY_DIR
+Boost_LIBRARY_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_PROGRAM_OPTIONS_LIBRARY_DEBUG
+Boost_PROGRAM_OPTIONS_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE
+Boost_PROGRAM_OPTIONS_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_AR
 CMAKE_AR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_BUILD_TOOL
@@ -353,4 +378,12 @@ OpenCV_CONFIG_PATH-ADVANCED:INTERNAL=1
 OpenCV_LIB_DIR_DBG-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: OpenCV_LIB_DIR_OPT
 OpenCV_LIB_DIR_OPT-ADVANCED:INTERNAL=1
+//Components requested for this build tree.
+_Boost_COMPONENTS_SEARCHED:INTERNAL=program_options
+//Last used Boost_INCLUDE_DIR value.
+_Boost_INCLUDE_DIR_LAST:INTERNAL=/usr/include
+//Last used Boost_LIBRARY_DIR value.
+_Boost_LIBRARY_DIR_LAST:INTERNAL=/usr/lib/x86_64-linux-gnu
+//Last used Boost_USE_MULTITHREADED value.
+_Boost_USE_MULTITHREADED_LAST:INTERNAL=TRUE
 

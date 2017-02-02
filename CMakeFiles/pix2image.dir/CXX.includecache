@@ -9,6 +9,10 @@
 /home/lemaitre/catkin_ws/src/pleora_polarcam/pix2image.cpp
 pix2image.h
 -
+boost/log/trivial.hpp
+-
+boost/scoped_ptr.hpp
+-
 
 include/pix2image.h
 vector
@@ -26,5 +30,7 @@ opencv2/imgproc/imgproc.hpp
 iostream
 -
 string
+-
+boost/scoped_ptr.hpp
 -
 
