@@ -15,7 +15,7 @@ namespace POLPro
         // declare the vector containing the 4 angles images
         const int nb_angles = 4;
         std::vector<cv::Mat> output_img(nb_angles);
-        for(auto img : output_img)
+        for(auto &img : output_img)
             img = cv::Mat::zeros(output_size, CV_8U);
 
         // copy the data in the new image
@@ -43,12 +43,12 @@ namespace POLPro
         const int nb_stokes_img = 3;
         // Create zeros images
         std::vector<cv::Mat> output_img(nb_stokes_img);
-        for(auto img : output_img)
+        for(auto &img : output_img)
             img = cv::Mat::zeros(angles_img.front().size(), CV_32F);
 
         // compute the Stokes parameters maps
         // S0: add the different angles
-        for(auto img : angles_img)
+        for(auto &img : angles_img)
             cv::add(output_img[0], img, output_img[0], cv::noArray(),
                     CV_32F);
             output_img[0] /= 2.0;
@@ -92,7 +92,7 @@ namespace POLPro
         const int nb_params = 3;
         // create the zeros images
         std::vector<cv::Mat> output_img(nb_params);
-        for(auto img : output_img)
+        for(auto &img : output_img)
             img = cv::Mat::zeros(stokes_img.front().size(), CV_32F);
 
         // compute the polar coordinate in degrees
@@ -151,7 +151,7 @@ namespace POLPro
                 img[2] = img[2] / 2;
             }
             // Convert to uint8
-            for(auto im : img)
+            for(auto &im : img)
                 im.convertTo(im, CV_8UC1);
         }
 
