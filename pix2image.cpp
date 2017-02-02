@@ -1,3 +1,5 @@
+#define BOOST_LOG_DYN_LINK 1
+
 #include <pix2image.h>
 #include <boost/log/trivial.hpp>
 #include <boost/scoped_ptr.hpp>
