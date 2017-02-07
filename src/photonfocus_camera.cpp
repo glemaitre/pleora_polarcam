@@ -153,8 +153,8 @@ void PhotonFocusCamera::acquireImages()
                 if(buffer->GetPayloadType() == PvPayloadTypeImage)
                 {
                     image = buffer->GetImage();
-                    raw_image = cv::Mat(image->GetHeight(),image->GetWidth(),CV_8UC1,image->GetDataPointer());
-                    //raw_image = cv::Mat(image->GetHeight(),image->GetWidth(),CV_16UC1,image->GetDataPointer());
+                    //raw_image = cv::Mat(image->GetHeight(),image->GetWidth(),CV_8UC1,image->GetDataPointer());
+                    raw_image = cv::Mat(image->GetHeight(),image->GetWidth(),CV_16UC1,image->GetDataPointer());
 
                     std::cout << " W:" << std::setw(4) << std::setfill(' ') << std::left << std::dec << raw_image.cols
                               << " H:" << std::setw(4) << std::setfill(' ') << std::left << std::dec << raw_image.rows;

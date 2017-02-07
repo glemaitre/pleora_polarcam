@@ -27,7 +27,7 @@ namespace POLPro
         const int nb_angles = 4;
         std::vector<cv::Mat> output_img(nb_angles);
         for (auto it = output_img.begin(); it != output_img.end(); ++it)
-            *it = cv::Mat::zeros(output_size, CV_8U);
+            *it = cv::Mat::zeros(output_size, CV_16U);
         
         // copy the data in the new image
         for (int angle = 0; angle < nb_angles; ++angle) {
@@ -164,7 +164,7 @@ namespace POLPro
             }
             // Convert to uint8
             for (int i = 0; i < img.size(); ++i){
-                img[i].convertTo(img[i], CV_8UC1);
+                img[i].convertTo(img[i], CV_16UC1);
             }
             
         }
@@ -186,7 +186,7 @@ namespace POLPro
             // Concatenate the images available together
             cv::Size img_size(img[0].cols, img[0].rows);
             output_img = cv::Mat::zeros
-                (img[0].rows*2, img[0].cols*2, CV_8UC1);
+                (img[0].rows*2, img[0].cols*2, CV_16UC1);
             int rows = img[0].rows; 
             int cols = img[0].cols;
             

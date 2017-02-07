@@ -81,8 +81,8 @@ public:
     void publishImage(const cv::Mat img)
     {
         cv_bridge::CvImage cv_image;
-        cv_image.encoding = "mono8";
-        //cv_image.encoding = "mono16";
+        //cv_image.encoding = "mono8";
+        cv_image.encoding = "mono16";
         cv_image.image = img;
         cv_image.header.stamp = ros::Time::now();
         image = cv_image.toImageMsg();
@@ -110,8 +110,8 @@ public:
         if(level >= (uint32_t) driver_base::SensorLevels::RECONFIGURE_STOP)
             camera->stop();
 
-        camera->setDeviceAttribute<PvGenEnum,std::string>("PixelFormat","Mono8");
-        //camera->setDeviceAttribute<PvGenEnum,std::string>("PixelFormat","Mono10");
+        //camera->setDeviceAttribute<PvGenEnum,std::string>("PixelFormat","Mono8");
+        camera->setDeviceAttribute<PvGenEnum,std::string>("PixelFormat","Mono10");
         camera->setDeviceAttribute<PvGenEnum,std::string>("PixelSize","Bpp8");
 
         //# ----- Image Size Control -----
