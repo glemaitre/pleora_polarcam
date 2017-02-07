@@ -86,8 +86,14 @@ public:
         cv_image.image = img;
         cv_image.header.stamp = ros::Time::now();
         image = cv_image.toImageMsg();
+	
 
-        sensor_msgs::CameraInfo::Ptr camera_info;
+	double min, max ;
+	cv::Point idmin, idmax;
+	cv::minMaxLoc(img, &min, &max, &idmin, &idmax);
+	std::cout << "min max values :" << min <<  "  _ " << max << std::endl;
+        
+	sensor_msgs::CameraInfo::Ptr camera_info;
         if(calibration_manager->isCalibrated()) // calibration exists
             camera_info.reset(new sensor_msgs::CameraInfo(calibration_manager->getCameraInfo()));
         else // calibration doesn't exist
@@ -112,7 +118,7 @@ public:
 
         //camera->setDeviceAttribute<PvGenEnum,std::string>("PixelFormat","Mono8");
         camera->setDeviceAttribute<PvGenEnum,std::string>("PixelFormat","Mono10");
-        camera->setDeviceAttribute<PvGenEnum,std::string>("PixelSize","Bpp8");
+        camera->setDeviceAttribute<PvGenEnum,std::string>("PixelSize","Bpp16");
 
         //# ----- Image Size Control -----
         //camera->setDeviceAttribute<PvGenInteger,long>("Width",config.Width*32+768);

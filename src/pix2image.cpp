@@ -20,6 +20,7 @@
 
 namespace POLPro
 {
+
     std::vector<cv::Mat> raw2mat(const cv::Mat& origin, const bool show=true) {
         // define the size of the output
         cv::Size output_size(origin.cols / 2, origin.rows / 2);
@@ -38,8 +39,9 @@ namespace POLPro
 
             for (int row = 0; row < origin.rows/2; ++row)
                 for (int col = 0; col < origin.cols/2; ++col)
-                    output_img[angle].at<uchar>(row, col) = origin.at<uchar>(
+		  output_img[angle].at<unsigned short>(row, col) = origin.at<unsigned short>(
                         2 * row + offset_row, 2 * col + offset_col);
+
         }
 
         if (show)
@@ -155,16 +157,16 @@ namespace POLPro
             if (is_stokes) {
                 // Stokes parameters normalization
                 img[0] /= 2.0;
-                img[1] = (img[1] + 255.0) / 2.0;
-                img[2] = (img[2] + 255.0) / 2.0;
+                img[1] = (img[1] + (cv::pow(2, 16))-1) / 2.0;
+			  img[2] = (img[2] + (cv::pow(2, 16))-1) / 2.0;
             } else {
                 // polarization parameters normalization
-                img[0] = img[0] * 255;
+	      img[0] = img[0] * (cv::pow(2, 16)) -1;
                 img[2] = img[2] / 2;
             }
             // Convert to uint8
             for (int i = 0; i < img.size(); ++i){
-                img[i].convertTo(img[i], CV_16UC1);
+                img[i].convertTo(img[i], CV_16U);
             }
             
         }
@@ -186,7 +188,7 @@ namespace POLPro
             // Concatenate the images available together
             cv::Size img_size(img[0].cols, img[0].rows);
             output_img = cv::Mat::zeros
-                (img[0].rows*2, img[0].cols*2, CV_16UC1);
+                (img[0].rows*2, img[0].cols*2, CV_16U);
             int rows = img[0].rows; 
             int cols = img[0].cols;
             
@@ -195,6 +197,7 @@ namespace POLPro
                 // we need to shift the image next to each other properly
                 int offset_col = i % 2;
                 int offset_row = i / 2;
+		BOOST_LOG_TRIVIAL(debug) << minmax(img[i], "Image");
                
                 img[i].copyTo(output_img(
                                   cv::Rect(img_size.width * offset_col,

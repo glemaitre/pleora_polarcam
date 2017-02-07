@@ -1,8 +1,8 @@
 <launch>
-	<node pkg="rosbag" type="play" name="rosbag" args="-d 2 $(find pleora_polarcam)/bags/_2016-12-07-17-09-15.bag" />
+	<node pkg="rosbag" type="play" name="rosbag" args="-d 2 $(find pleora_polarcam)/bags/_2017-02-07-17-29-02.bag" />
 	<node name="extract" pkg= "image_view" type="extract_images" respawn="false" output="screen" cwd ="node">
 	<remap from="image" to="/pleora_polarcam_driver/image_raw/" />
-	<param name="filename_format" value="/home/lemaitre/test/frame%06i.jpg" />
+	<param name="filename_format" value="$(find pleora_polarcam)/images/frame%06i.jpg" />
 
 	</node>
 
